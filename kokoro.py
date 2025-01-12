@@ -1,6 +1,18 @@
 import phonemizer
 import re
 import torch
+import sys
+import numpy as np
+from voices import VoiceName, LanguageCode
+
+if sys.platform.startswith('darwin'):
+    print('MacOS detected')
+    try:
+        from phonemizer.backend.espeak.wrapper import EspeakWrapper
+        EspeakWrapper.set_library('/opt/homebrew/Cellar/espeak-ng/1.52.0/lib/libespeak-ng.1.dylib')
+    except Exception as e:
+        print(e)
+        print('Failed to set espeak-ng library path. Try running "brew install espeak-ng"')
 
 def split_num(num):
     num = num.group()
@@ -90,7 +102,7 @@ phonemizers = dict(
     a=phonemizer.backend.EspeakBackend(language='en-us', preserve_punctuation=True, with_stress=True),
     b=phonemizer.backend.EspeakBackend(language='en-gb', preserve_punctuation=True, with_stress=True),
 )
-def phonemize(text, lang, norm=True):
+def phonemize(text: str, lang: LanguageCode, norm: bool | None = True) -> str:
     if norm:
         text = normalize_text(text)
     ps = phonemizers[lang].phonemize([text])
@@ -105,13 +117,16 @@ def phonemize(text, lang, norm=True):
     ps = ''.join(filter(lambda p: p in VOCAB, ps))
     return ps.strip()
 
-def length_to_mask(lengths):
+def length_to_mask(lengths: torch.Tensor) -> torch.Tensor:
     mask = torch.arange(lengths.max()).unsqueeze(0).expand(lengths.shape[0], -1).type_as(lengths)
     mask = torch.gt(mask+1, lengths.unsqueeze(1))
     return mask
 
 @torch.no_grad()
-def forward(model, tokens, ref_s, speed):
+def forward(model: torch.nn.Module, 
+           tokens: torch.Tensor, 
+           ref_s: torch.Tensor | None = None, 
+           speed: float = 1.0) -> np.ndarray:
     device = ref_s.device
     tokens = torch.LongTensor([[0, *tokens, 0]]).to(device)
     input_lengths = torch.LongTensor([tokens.shape[-1]]).to(device)
@@ -135,7 +150,12 @@ def forward(model, tokens, ref_s, speed):
     asr = t_en @ pred_aln_trg.unsqueeze(0).to(device)
     return model.decoder(asr, F0_pred, N_pred, ref_s[:, :128]).squeeze().cpu().numpy()
 
-def generate(model, text, voicepack, lang='a', speed=1, ps=None):
+def generate(model: torch.nn.Module,
+            text: str,
+            voicepack: VoiceName,
+            lang: LanguageCode = 'a',
+            speed: float = 1,
+            ps: str | None = None) -> tuple[np.ndarray, str] | None:
     ps = ps or phonemize(text, lang)
     tokens = tokenize(ps)
     if not tokens:

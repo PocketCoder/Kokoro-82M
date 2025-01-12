@@ -1,0 +1,12 @@
+phonemizer
+torch
+transformers
+scipy
+munch
+sounddevice
+opuslib
+pydub
+
+# For notebook development (optional)
+ipykernel
+ipywidgets
