@@ -6,7 +6,7 @@ base_model:
 - yl4579/StyleTTS2-LJSpeech
 pipeline_tag: text-to-speech
 ---
-📣 Jan 12 Status: Intent to improve the base model https://hf.co/hexgrad/Kokoro-82M/discussions/36
+📣 Jan 21: A new Kokoro model should land in about a week, towards the end of January https://hf.co/hexgrad/Kokoro-82M/discussions/36
 
 ❤️ Kokoro Discord Server: https://discord.gg/QuGxSWBfQy
 
