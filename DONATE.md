@@ -39,7 +39,7 @@ After signing in to RunPod, under `Account > Billing > Credit Codes`, you can "g
 > Simply give them the code and they will be able to redeem it for credits on their billing page. Please safeguard your codes as they are worth money!
 > Credits will be debited from your account immediately. You can redeem the code yourself if you want to recover your credits. There is a 2% transaction fee for payment processing!
 
-If you wish to send codes, you can do so by email `hello@hexgrad.com`, or DM me on Discord `@rzvzn`.
+If you wish to send codes, you can do so by emailing `hello@hexgrad.com`, or DM me on Discord `@rzvzn`.
 
 ### Coming Soon: GitHub Sponsors
 GitHub Sponsors application currently pending for: https://github.com/hexgrad
