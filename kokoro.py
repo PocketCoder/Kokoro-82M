@@ -167,3 +167,17 @@ def generate(model: torch.nn.Module,
     out = forward(model, tokens, ref_s, speed)
     ps = ''.join(next(k for k, v in VOCAB.items() if i == v) for i in tokens)
     return out, ps
+def generate_full(model, text, voicepack, lang="a", speed=1, ps=None):
+    ps = ps or phonemize(text, lang)
+    tokens = tokenize(ps)
+    if not tokens:
+        return None
+    outs = []
+    loop_count = len(tokens) // 510 + (1 if len(tokens) % 510 != 0 else 0)
+    for i in range(loop_count):
+        ref_s = voicepack[len(tokens[i * 510 : (i + 1) * 510])]
+        out = forward(model, tokens[i * 510 : (i + 1) * 510], ref_s, speed)
+        outs.append(out)
+    outs = np.concatenate(outs)
+    ps = "".join(next(k for k, v in VOCAB.items() if i == v) for i in tokens)
+    return outs, ps
